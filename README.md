@@ -1,3 +1,2 @@
-# CSE160 Assignment 2 Blocky 3D Animal
-A class assignment to create an interactive program centered around a 3D animal.
-ChatGPT was consulted once to get an fps formula, which is cited in asg2.js.
+# CSE160 Assignment 3 Creating a Virtual World
+A class assignment to create a 3D world first-person exploration program using WebGL. 
