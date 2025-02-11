@@ -1,22 +1,29 @@
 const VSHADER_SOURCE = `
+	precision mediump float;
 	attribute vec4 a_Position;
+	attribute vec2 a_UV;
+	varying vec2 v_UV;
 	uniform mat4 u_ModelMatrix;
 	uniform mat4 u_GlobalRotationMatrix;
 	void main() {
 		gl_Position = u_GlobalRotationMatrix * u_ModelMatrix * a_Position;
+		v_UV = a_UV;
 	}
 `;
 const FSHADER_SOURCE = `
 	precision mediump float;
+	varying vec2 v_UV;
 	uniform vec4 u_FragColor;
 	void main() {
 		gl_FragColor = u_FragColor;
+		gl_FragColor = vec4(v_UV, 1, 1);
 	}
 `;
 
 let canvas;
 let gl;
 let a_Position;
+let a_UV;
 let u_ModelMatrix;
 let u_FragColor;
 let u_GlobalRotationMatrix;
@@ -24,40 +31,31 @@ let u_GlobalRotationMatrix;
 function getCanvasAndContext() {
 	canvas = document.getElementById("webgl");
 	gl = canvas.getContext("webgl", { preserveDrawingBuffer: true });
-	if (!gl) {
-		throw new Error("Failed to get the rendering context for WebGL");
-	}
+	if (!gl) throw new Error("Failed to get the rendering context for WebGL.");
 	gl.enable(gl.DEPTH_TEST);
 }
 
 function compileShadersAndConnectVariables() {
-	if (!initShaders(gl, VSHADER_SOURCE, FSHADER_SOURCE)) {
-		throw new Error("Failed to intialize shaders");
-	}
+	if (!initShaders(gl, VSHADER_SOURCE, FSHADER_SOURCE)) throw new Error("Failed to intialize shaders.");
 
-	const identity = new Matrix4();
+	const identityMatrix = new Matrix4();
 
 	a_Position = gl.getAttribLocation(gl.program, "a_Position");
-	if (a_Position < 0) {
-		throw new Error("Failed to get the storage location of a_Position");
-	}
+	if (a_Position < 0) throw new Error("Failed to get the storage location of a_Position.");
+
+	a_UV = gl.getAttribLocation(gl.program, "a_UV");
+	if (a_UV < 0) throw new Error("Failed to get the storage location of a_UV.");
 
 	u_ModelMatrix = gl.getUniformLocation(gl.program, "u_ModelMatrix");
-	if (!u_ModelMatrix) {
-		throw new Error("Failed to get the storage location of u_ModelMatrix");
-	}
-	gl.uniformMatrix4fv(u_ModelMatrix, false, identity.elements);
+	if (!u_ModelMatrix) throw new Error("Failed to get the storage location of u_ModelMatrix.");
+	gl.uniformMatrix4fv(u_ModelMatrix, false, identityMatrix.elements);
 
 	u_FragColor = gl.getUniformLocation(gl.program, "u_FragColor");
-	if (!u_FragColor) {
-		throw new Error("Failed to get the storage location of u_FragColor");
-	}
+	if (!u_FragColor) throw new Error("Failed to get the storage location of u_FragColor.");
 
 	u_GlobalRotationMatrix = gl.getUniformLocation(gl.program, "u_GlobalRotationMatrix");
-	if (!u_GlobalRotationMatrix) {
-		throw new Error("Failed to get the storage location of u_GlobalRotationMatrix");
-	}
-	gl.uniformMatrix4fv(u_GlobalRotationMatrix, false, identity.elements);
+	if (!u_GlobalRotationMatrix) throw new Error("Failed to get the storage location of u_GlobalRotationMatrix.");
+	gl.uniformMatrix4fv(u_GlobalRotationMatrix, false, identityMatrix.elements);
 }
 
 let g_globalRotation_y = 0;	// y axis
@@ -291,13 +289,6 @@ function renderAllShapes() {
 	tongue_tip.matrix.scale(0.2, 0.1, 0.05);
 	tongue_tip.matrix.translate(-0.5, -1, -0.5);
 	tongue_tip.render();
-
-	const hat = new Pyramid();
-	hat.color = [1, 1, 0, 1];	// yellow
-	hat.matrix = new Matrix4(headCoordsMatrix);
-	hat.matrix.translate(-0.125, 0.2, 0.05);
-	hat.matrix.scale(0.25, 0.25, 0.25);
-	hat.render();
 
 	const duration = performance.now() - startTime;
 	fpsCounter.innerHTML = `ms: ${duration}, fps: ${Math.floor(1000 / duration)}`;	// got this formula for fps from ChatGPT
