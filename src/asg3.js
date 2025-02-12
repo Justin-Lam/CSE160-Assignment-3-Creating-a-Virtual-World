@@ -5,20 +5,33 @@ const VSHADER_SOURCE = `
 	varying vec2 v_UV;
 	uniform mat4 u_ModelMatrix;
 	uniform mat4 u_GlobalRotationMatrix;
+
 	void main() {
 		gl_Position = u_GlobalRotationMatrix * u_ModelMatrix * a_Position;
 		v_UV = a_UV;
 	}
 `;
+
 const FSHADER_SOURCE = `
 	precision mediump float;
 	varying vec2 v_UV;
 	uniform vec4 u_FragColor;
 	uniform sampler2D u_Sampler0;
+	uniform int u_TextureType;
+
 	void main() {
-		gl_FragColor = u_FragColor;
-		gl_FragColor = vec4(v_UV, 1, 1);
-		gl_FragColor = texture2D(u_Sampler0, v_UV);
+		if (u_TextureType == -1) {
+			gl_FragColor = vec4(v_UV, 1, 1);				// use UV debug color
+		}
+		else if (u_TextureType == 0) {
+			gl_FragColor = u_FragColor;						// use color
+		}
+		else if (u_TextureType == 1) {
+			gl_FragColor = texture2D(u_Sampler0, v_UV);		// use TEXTURE0
+		}
+		else {
+			gl_FragColor = vec4(1, 0.2, 0.2, 1);			// error, make red
+		}
 	}
 `;
 
@@ -28,9 +41,12 @@ let gl;
 let a_Position;
 let a_UV;
 let u_ModelMatrix;
+let u_GlobalRotationMatrix;
+
 let u_FragColor;
 let u_Sampler0;
-let u_GlobalRotationMatrix;
+let u_TextureType;
+
 
 function getCanvasAndContext() {
 	canvas = document.getElementById("webgl");
@@ -54,25 +70,28 @@ function compileShadersAndConnectVariables() {
 	if (!u_ModelMatrix) throw new Error("Failed to get the storage location of u_ModelMatrix.");
 	gl.uniformMatrix4fv(u_ModelMatrix, false, identityMatrix.elements);
 
+	u_GlobalRotationMatrix = gl.getUniformLocation(gl.program, "u_GlobalRotationMatrix");
+	if (!u_GlobalRotationMatrix) throw new Error("Failed to get the storage location of u_GlobalRotationMatrix.");
+	gl.uniformMatrix4fv(u_GlobalRotationMatrix, false, identityMatrix.elements);
+
 	u_FragColor = gl.getUniformLocation(gl.program, "u_FragColor");
 	if (!u_FragColor) throw new Error("Failed to get the storage location of u_FragColor.");
 
 	u_Sampler0 = gl.getUniformLocation(gl.program, "u_Sampler0");
 	if (!u_Sampler0) throw new Error("Failed to get the storage location of u_Sampler0.");
 
-	u_GlobalRotationMatrix = gl.getUniformLocation(gl.program, "u_GlobalRotationMatrix");
-	if (!u_GlobalRotationMatrix) throw new Error("Failed to get the storage location of u_GlobalRotationMatrix.");
-	gl.uniformMatrix4fv(u_GlobalRotationMatrix, false, identityMatrix.elements);
+	u_TextureType = gl.getUniformLocation(gl.program, "u_TextureType");
+	if (!u_TextureType) throw new Error("Failed to get the storage location of u_TextureType.");
 }
 
 function initTextures() {
 	const image = new Image();
 	if (!image) throw new Error("Failed to create the image object.");
-	image.onload = () => sendTextureToGLSL(image);
+	image.onload = () => sendTextureTo_TEXTURE0(image);
 	image.src = "../assets/sky.jpg";
 }
 
-function sendTextureToGLSL(image) {
+function sendTextureTo_TEXTURE0(image) {
 	const texture = gl.createTexture();
 	if (!texture) throw new Error("Failed to create the texture object.");
 
@@ -92,11 +111,10 @@ function sendTextureToGLSL(image) {
 	gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, image);
 
 	// Set the texture unit0 to the sampler
-	gl.uniform1i(u_Sampler, 0);
+	gl.uniform1i(u_Sampler0, 0);
 
 	console.log("finished loading texture");
 }
-
 
 let g_globalRotation_y = 0;	// y axis
 let g_globalRotation_x = 0;	// x axis

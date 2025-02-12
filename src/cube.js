@@ -1,6 +1,7 @@
 class Cube {
 	constructor() {
-		this.color = [1,1,1,1];  // white
+		this.color = [1,1,1,1];	// white
+		this.textureType = 1;	// use texture
 		this.matrix = new Matrix4();
 	}
 
@@ -8,6 +9,7 @@ class Cube {
 		const rgba = this.color;
 
 		gl.uniform4f(u_FragColor, rgba[0], rgba[1], rgba[2], rgba[3]);
+		gl.uniform1i(u_TextureType, this.textureType);
 		gl.uniformMatrix4fv(u_ModelMatrix, false, this.matrix.elements);
 
 		// front
