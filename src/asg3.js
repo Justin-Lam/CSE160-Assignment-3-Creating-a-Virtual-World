@@ -5,9 +5,11 @@ const VSHADER_SOURCE = `
 	varying vec2 v_UV;
 	uniform mat4 u_ModelMatrix;
 	uniform mat4 u_GlobalRotationMatrix;
+	uniform mat4 u_ViewMatrix;
+	uniform mat4 u_ProjectionMatrix;
 
 	void main() {
-		gl_Position = u_GlobalRotationMatrix * u_ModelMatrix * a_Position;
+		gl_Position = u_ProjectionMatrix * u_ViewMatrix * u_GlobalRotationMatrix * u_ModelMatrix * a_Position;
 		v_UV = a_UV;
 	}
 `;
@@ -42,6 +44,8 @@ let a_Position;
 let a_UV;
 let u_ModelMatrix;
 let u_GlobalRotationMatrix;
+let u_ViewMatrix;
+let u_ProjectionMatrix;
 
 let u_FragColor;
 let u_Sampler0;
@@ -73,6 +77,14 @@ function compileShadersAndConnectVariables() {
 	u_GlobalRotationMatrix = gl.getUniformLocation(gl.program, "u_GlobalRotationMatrix");
 	if (!u_GlobalRotationMatrix) throw new Error("Failed to get the storage location of u_GlobalRotationMatrix.");
 	gl.uniformMatrix4fv(u_GlobalRotationMatrix, false, identityMatrix.elements);
+
+	u_ViewMatrix = gl.getUniformLocation(gl.program, "u_ViewMatrix");
+	if (!u_ViewMatrix) throw new Error("Failed to get the storage location of u_ViewMatrix.");
+	gl.uniformMatrix4fv(u_ViewMatrix, false, identityMatrix.elements);
+
+	u_ProjectionMatrix = gl.getUniformLocation(gl.program, "u_ProjectionMatrix");
+	if (!u_ProjectionMatrix) throw new Error("Failed to get the storage location of u_ProjectionMatrix.");
+	gl.uniformMatrix4fv(u_ProjectionMatrix, false, identityMatrix.elements);
 
 	u_FragColor = gl.getUniformLocation(gl.program, "u_FragColor");
 	if (!u_FragColor) throw new Error("Failed to get the storage location of u_FragColor.");
@@ -256,14 +268,17 @@ function updateAnimationAngles() {
 	}
 }
 
-const fpsCounter = document.getElementById("fpsCounter");
 function renderAllShapes() {
-	const startTime = performance.now();
-
 	const globalRotationMatrix = new Matrix4();
 	globalRotationMatrix.rotate(g_globalRotation_x, 1, 0, 0);
 	globalRotationMatrix.rotate(-g_globalRotation_y, 0, 1, 0);
 	gl.uniformMatrix4fv(u_GlobalRotationMatrix, false, globalRotationMatrix.elements);
+
+	const viewMatrix = new Matrix4();
+	gl.uniformMatrix4fv(u_ViewMatrix, false, viewMatrix.elements);
+
+	const projectionMatrix = new Matrix4();
+	gl.uniformMatrix4fv(u_ProjectionMatrix, false, projectionMatrix.elements);
 
 	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
@@ -348,7 +363,4 @@ function renderAllShapes() {
 	tongue_tip.matrix.scale(0.2, 0.1, 0.05);
 	tongue_tip.matrix.translate(-0.5, -1, -0.5);
 	tongue_tip.render();
-
-	const duration = performance.now() - startTime;
-	fpsCounter.innerHTML = `ms: ${duration}, fps: ${Math.floor(1000 / duration)}`;	// got this formula for fps from ChatGPT
 }
