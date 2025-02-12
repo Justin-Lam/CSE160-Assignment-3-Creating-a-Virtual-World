@@ -14,18 +14,22 @@ const FSHADER_SOURCE = `
 	precision mediump float;
 	varying vec2 v_UV;
 	uniform vec4 u_FragColor;
+	uniform sampler2D u_Sampler0;
 	void main() {
 		gl_FragColor = u_FragColor;
 		gl_FragColor = vec4(v_UV, 1, 1);
+		gl_FragColor = texture2D(u_Sampler0, v_UV);
 	}
 `;
 
 let canvas;
 let gl;
+
 let a_Position;
 let a_UV;
 let u_ModelMatrix;
 let u_FragColor;
+let u_Sampler0;
 let u_GlobalRotationMatrix;
 
 function getCanvasAndContext() {
@@ -53,10 +57,46 @@ function compileShadersAndConnectVariables() {
 	u_FragColor = gl.getUniformLocation(gl.program, "u_FragColor");
 	if (!u_FragColor) throw new Error("Failed to get the storage location of u_FragColor.");
 
+	u_Sampler0 = gl.getUniformLocation(gl.program, "u_Sampler0");
+	if (!u_Sampler0) throw new Error("Failed to get the storage location of u_Sampler0.");
+
 	u_GlobalRotationMatrix = gl.getUniformLocation(gl.program, "u_GlobalRotationMatrix");
 	if (!u_GlobalRotationMatrix) throw new Error("Failed to get the storage location of u_GlobalRotationMatrix.");
 	gl.uniformMatrix4fv(u_GlobalRotationMatrix, false, identityMatrix.elements);
 }
+
+function initTextures() {
+	const image = new Image();
+	if (!image) throw new Error("Failed to create the image object.");
+	image.onload = () => sendTextureToGLSL(image);
+	image.src = "../assets/sky.jpg";
+}
+
+function sendTextureToGLSL(image) {
+	const texture = gl.createTexture();
+	if (!texture) throw new Error("Failed to create the texture object.");
+
+	// Flip the image's y axis
+	gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
+
+	// Enable texture unit0
+	gl.activeTexture(gl.TEXTURE0);
+
+	// Bind the texture object to the target
+	gl.bindTexture(gl.TEXTURE_2D, texture);
+
+	// Set the texture parameters
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+
+	// Set the texture image
+	gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, image);
+
+	// Set the texture unit0 to the sampler
+	gl.uniform1i(u_Sampler, 0);
+
+	console.log("finished loading texture");
+}
+
 
 let g_globalRotation_y = 0;	// y axis
 let g_globalRotation_x = 0;	// x axis
@@ -122,6 +162,7 @@ function createUIEvents() {
 function main() {
 	getCanvasAndContext();
 	compileShadersAndConnectVariables();
+	initTextures();
 	createUIEvents();
 	canvas.onmousemove = function(e) { if (e.buttons === 1) { rotateCamera(e) } };
 	canvas.onmousedown = function(e) {
