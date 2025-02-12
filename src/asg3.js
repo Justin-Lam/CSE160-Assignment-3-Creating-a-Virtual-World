@@ -39,6 +39,7 @@ const FSHADER_SOURCE = `
 
 let canvas;
 let gl;
+let camera;
 
 let a_Position;
 let a_UV;
@@ -194,30 +195,20 @@ function main() {
 	compileShadersAndConnectVariables();
 	initTextures();
 	createUIEvents();
-	canvas.onmousemove = function(e) { if (e.buttons === 1) { rotateCamera(e) } };
-	canvas.onmousedown = function(e) {
-		if (e.shiftKey) {
-			g_interactiveAnimationStartTime = g_elapsedTime;
-			g_interactiveAnimationPlaying = true;
-		}
-	};
+	camera = new Camera();
+	document.onkeydown = (e) => onKeydown(e);
 	gl.clearColor(0.0, 0.0, 0.0, 1.0);
 	requestAnimationFrame(tick);
 }
 
-
-function rotateCamera(e) {
-	const [x, y] = eCoordsToGL(e);
-	g_globalRotation_y = 180 * x;
-	g_globalRotation_x = 180 * y;
-}
-function eCoordsToGL(e) {
-	let x = e.clientX;
-	let y = e.clientY;
-	const rect = e.target.getBoundingClientRect();
-	x = ((x - rect.left) - canvas.width/2)/(canvas.width/2);
-	y = (canvas.height/2 - (y - rect.top))/(canvas.height/2);
-	return [x, y];
+function onKeydown(e) {
+	if (e.key === 'w') camera.moveForward();
+	else if (e.key === 's') camera.moveBackward();
+	else if (e.key === 'a') camera.moveLeft();
+	else if (e.key === 'd') camera.moveRight();
+	else if (e.key === 'q') camera.panLeft();
+	else if (e.key === 'e') camera.panRight();
+	renderAllShapes();
 }
 
 const g_startTime = currentTime();
@@ -277,14 +268,8 @@ function renderAllShapes() {
 	globalRotationMatrix.rotate(g_globalRotation_x, 1, 0, 0);
 	globalRotationMatrix.rotate(-g_globalRotation_y, 0, 1, 0);
 	gl.uniformMatrix4fv(u_GlobalRotationMatrix, false, globalRotationMatrix.elements);
-
-	const viewMatrix = new Matrix4();
-	viewMatrix.setLookAt(...g_eye, ...g_at, ...g_up);
-	gl.uniformMatrix4fv(u_ViewMatrix, false, viewMatrix.elements);
-
-	const projectionMatrix = new Matrix4();
-	projectionMatrix.setPerspective(60, canvas.width/canvas.height, 0.1, 100);	// fov, aspect, near, far
-	gl.uniformMatrix4fv(u_ProjectionMatrix, false, projectionMatrix.elements);
+	gl.uniformMatrix4fv(u_ViewMatrix, false, camera.viewMatrix.elements);
+	gl.uniformMatrix4fv(u_ProjectionMatrix, false, camera.projectionMatrix.elements);
 
 	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 

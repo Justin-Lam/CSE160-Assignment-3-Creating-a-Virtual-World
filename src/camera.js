@@ -1,5 +1,6 @@
 class Camera {
 	moveSpeed = 1;
+	panAmount = 15;
 
 	constructor() {
 		this.fov = 60;
@@ -7,7 +8,6 @@ class Camera {
 		this.at = new Vector3([0, 0, -1]);
 		this.up = new Vector3([0, 1, 0]);
 		this.viewMatrix = new Matrix4();
-		this.viewMatrix.setLookAt(...this.eye.elements, ... this.at.elements, ...this.up.elements);
 		this.projectionMatrix = new Matrix4();
 		this.projectionMatrix.setPerspective(this.fov, canvas.width/canvas.height, 0.1, 1000);
 	}
@@ -19,6 +19,7 @@ class Camera {
 
 		this.eye.add(fwd);
 		this.at.add(fwd);
+		this.viewMatrix.setLookAt(...this.eye.elements, ... this.at.elements, ...this.up.elements);
 	}
 	moveBackward() {
 		const fwd = new Vector3().set(this.eye).sub(this.at);	// fwd = eye - at
@@ -27,6 +28,7 @@ class Camera {
 
 		this.eye.add(fwd);
 		this.at.add(fwd);
+		this.viewMatrix.setLookAt(...this.eye.elements, ... this.at.elements, ...this.up.elements);
 	}
 	moveLeft() {
 		const fwd = new Vector3().set(this.at).sub(this.eye);	// fwd = at - eye
@@ -36,6 +38,7 @@ class Camera {
 
 		this.eye.add(side);
 		this.at.add(side);
+		this.viewMatrix.setLookAt(...this.eye.elements, ... this.at.elements, ...this.up.elements);
 	}
 	moveRight() {
 		const fwd = new Vector3().set(this.at).sub(this.eye);	// fwd = at - eye
@@ -45,13 +48,25 @@ class Camera {
 
 		this.eye.add(side);
 		this.at.add(side);
+		this.viewMatrix.setLookAt(...this.eye.elements, ... this.at.elements, ...this.up.elements);
 	}
-	pan(angle) {
+
+	// Only difference between the two is the sign of this.panAmount
+	panLeft() {
 		const fwd_current = new Vector3().set(this.at).sub(this.eye);	// fwd = at - eye
-		const rotationMatrix = new Matrix4();
-		rotationMatrix.setRotate(angle, this.up.x, this.up.y, this.up.z);
+		const rotationMatrix = new Matrix4().setRotate(this.panAmount, ...this.up.elements);
 		const fwd_new = rotationMatrix.multiplyVector3(fwd_current);
 
 		this.at.set(this.eye).add(fwd_new);	// at = eye + fwd_new
+		this.viewMatrix.setLookAt(...this.eye.elements, ... this.at.elements, ...this.up.elements);
+	}
+	panRight() {
+		const fwd_current = new Vector3().set(this.at).sub(this.eye);	// fwd = at - eye
+		const rotationMatrix = new Matrix4();
+		rotationMatrix.setRotate(-this.panAmount, ...this.up.elements);
+		const fwd_new = rotationMatrix.multiplyVector3(fwd_current);
+
+		this.at.set(this.eye).add(fwd_new);	// at = eye + fwd_new
+		this.viewMatrix.setLookAt(...this.eye.elements, ... this.at.elements, ...this.up.elements);
 	}
 }
