@@ -268,6 +268,10 @@ function updateAnimationAngles() {
 	}
 }
 
+let g_eye = [0, 0, 3];
+let g_at = [0, 0, -100];
+let g_up = [0, 1, 0];
+
 function renderAllShapes() {
 	const globalRotationMatrix = new Matrix4();
 	globalRotationMatrix.rotate(g_globalRotation_x, 1, 0, 0);
@@ -275,9 +279,11 @@ function renderAllShapes() {
 	gl.uniformMatrix4fv(u_GlobalRotationMatrix, false, globalRotationMatrix.elements);
 
 	const viewMatrix = new Matrix4();
+	viewMatrix.setLookAt(...g_eye, ...g_at, ...g_up);
 	gl.uniformMatrix4fv(u_ViewMatrix, false, viewMatrix.elements);
 
 	const projectionMatrix = new Matrix4();
+	projectionMatrix.setPerspective(60, canvas.width/canvas.height, 0.1, 100);	// fov, aspect, near, far
 	gl.uniformMatrix4fv(u_ProjectionMatrix, false, projectionMatrix.elements);
 
 	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
