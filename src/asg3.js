@@ -264,6 +264,12 @@ function renderAllShapes() {
 
 	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
+	const floor = new Cube();
+	floor.matrix.translate(0, -0.5, 0);
+	floor.matrix.scale(32, 0, 32);	// scale y to 0 makes a plane
+	floor.matrix.translate(-0.5, -0.5, -0.5);
+	floor.render();
+
 	const body = new Cube();
 	body.color = [1, 0, 0.8, 1];	// pink
 	body.matrix.translate(-0.25, -0.25, 0);

@@ -1,7 +1,7 @@
 class Cube {
 	constructor() {
 		this.color = [1,1,1,1];	// white
-		this.textureType = 1;	// use texture
+		/** -1: debug, 0: color, 1: texture */this.textureType = 1;
 		this.matrix = new Matrix4();
 	}
 
