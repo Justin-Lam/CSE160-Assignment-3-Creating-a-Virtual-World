@@ -22,18 +22,10 @@ const FSHADER_SOURCE = `
 	uniform int u_TextureType;
 
 	void main() {
-		if (u_TextureType == -1) {
-			gl_FragColor = vec4(v_UV, 1, 1);				// use UV debug color
-		}
-		else if (u_TextureType == 0) {
-			gl_FragColor = u_FragColor;						// use color
-		}
-		else if (u_TextureType == 1) {
-			gl_FragColor = texture2D(u_Sampler0, v_UV);		// use TEXTURE0
-		}
-		else {
-			gl_FragColor = vec4(1, 0.2, 0.2, 1);			// error, make red
-		}
+		if (u_TextureType == -1) 		gl_FragColor = vec4(v_UV, 1, 1);				// use UV debug color
+		else if (u_TextureType == 0) 	gl_FragColor = u_FragColor;						// use color
+		else if (u_TextureType == 1) 	gl_FragColor = texture2D(u_Sampler0, v_UV);		// use TEXTURE0
+		else 							gl_FragColor = vec4(1, 0.2, 0.2, 1);			// error, make red
 	}
 `;
 
@@ -52,15 +44,19 @@ let u_FragColor;
 let u_Sampler0;
 let u_TextureType;
 
-
-function getCanvasAndContext() {
+/** Gets this.canvas, this.gl, and this.camera. */
+function getGlobalVars() {
 	canvas = document.getElementById("webgl");
+
 	gl = canvas.getContext("webgl", { preserveDrawingBuffer: true });
 	if (!gl) throw new Error("Failed to get the rendering context for WebGL.");
 	gl.enable(gl.DEPTH_TEST);
+
+	camera = new Camera();
 }
 
-function compileShadersAndConnectVariables() {
+/** Compiles shaders and links GLSL ES variables. */
+function setupWebGL() {
 	if (!initShaders(gl, VSHADER_SOURCE, FSHADER_SOURCE)) throw new Error("Failed to intialize shaders.");
 
 	const identityMatrix = new Matrix4();
@@ -81,11 +77,9 @@ function compileShadersAndConnectVariables() {
 
 	u_ViewMatrix = gl.getUniformLocation(gl.program, "u_ViewMatrix");
 	if (!u_ViewMatrix) throw new Error("Failed to get the storage location of u_ViewMatrix.");
-	gl.uniformMatrix4fv(u_ViewMatrix, false, identityMatrix.elements);
 
 	u_ProjectionMatrix = gl.getUniformLocation(gl.program, "u_ProjectionMatrix");
 	if (!u_ProjectionMatrix) throw new Error("Failed to get the storage location of u_ProjectionMatrix.");
-	gl.uniformMatrix4fv(u_ProjectionMatrix, false, identityMatrix.elements);
 
 	u_FragColor = gl.getUniformLocation(gl.program, "u_FragColor");
 	if (!u_FragColor) throw new Error("Failed to get the storage location of u_FragColor.");
@@ -125,8 +119,6 @@ function sendTextureTo_TEXTURE0(image) {
 
 	// Set the texture unit0 to the sampler
 	gl.uniform1i(u_Sampler0, 0);
-
-	console.log("finished loading texture");
 }
 
 let g_globalRotation_y = 0;	// y axis
@@ -191,13 +183,12 @@ function createUIEvents() {
 }
 
 function main() {
-	getCanvasAndContext();
-	compileShadersAndConnectVariables();
+	getGlobalVars();
+	setupWebGL();
 	initTextures();
 	createUIEvents();
-	camera = new Camera();
 	document.onkeydown = (e) => onKeydown(e);
-	gl.clearColor(0.0, 0.0, 0.0, 1.0);
+	gl.clearColor(0,0,0,1);	// black
 	requestAnimationFrame(tick);
 }
 
