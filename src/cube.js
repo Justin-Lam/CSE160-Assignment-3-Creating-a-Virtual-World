@@ -1,15 +1,18 @@
 class Cube {
 	constructor() {
 		this.color = [1,1,1,1];	// white
-		/** -1: debug, 0: color, 1: texture */this.textureType = 1;
+
+		/** -1: debug, 0: color, 1: texture */
+		this.renderType = 1;
+
 		this.matrix = new Matrix4();
 	}
 
 	render() {
 		const rgba = this.color;
 
-		gl.uniform4f(u_FragColor, rgba[0], rgba[1], rgba[2], rgba[3]);
-		gl.uniform1i(u_TextureType, this.textureType);
+		gl.uniform4f(u_FragColor, ...rgba);
+		gl.uniform1i(u_RenderType, this.renderType);
 		gl.uniformMatrix4fv(u_ModelMatrix, false, this.matrix.elements);
 
 		// front

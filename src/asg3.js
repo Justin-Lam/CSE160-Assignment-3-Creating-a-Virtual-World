@@ -18,12 +18,12 @@ const FSHADER_SOURCE = `
 	varying vec2 v_UV;
 	uniform vec4 u_FragColor;
 	uniform sampler2D u_Sampler0;
-	uniform int u_TextureType;
+	uniform int u_RenderType;
 
 	void main() {
-		if (u_TextureType == -1) 		gl_FragColor = vec4(v_UV, 1, 1);				// use UV debug color
-		else if (u_TextureType == 0) 	gl_FragColor = u_FragColor;						// use color
-		else if (u_TextureType == 1) 	gl_FragColor = texture2D(u_Sampler0, v_UV);		// use TEXTURE0
+		if 		(u_RenderType == -1) 	gl_FragColor = vec4(v_UV, 1, 1);				// use UV debug color
+		else if (u_RenderType == 0) 	gl_FragColor = u_FragColor;						// use color
+		else if (u_RenderType == 1) 	gl_FragColor = texture2D(u_Sampler0, v_UV);		// use TEXTURE0
 		else 							gl_FragColor = vec4(1, 0.2, 0.2, 1);			// error, make red
 	}
 `;
@@ -76,7 +76,7 @@ let u_ProjectionMatrix;
 
 let u_FragColor;
 let u_Sampler0;
-let u_TextureType;
+let u_RenderType;
 
 function main() {
 	getGlobalVars();
@@ -130,8 +130,8 @@ function setupWebGL() {
 	u_Sampler0 = gl.getUniformLocation(gl.program, "u_Sampler0");
 	if (!u_Sampler0) throw new Error("Failed to get the storage location of u_Sampler0.");
 
-	u_TextureType = gl.getUniformLocation(gl.program, "u_TextureType");
-	if (!u_TextureType) throw new Error("Failed to get the storage location of u_TextureType.");
+	u_RenderType = gl.getUniformLocation(gl.program, "u_RenderType");
+	if (!u_RenderType) throw new Error("Failed to get the storage location of u_RenderType.");
 }
 
 function initTextures() {
@@ -176,6 +176,7 @@ function onKeydown(e) {
 
 function tick() {
 	render();
+	updateFPSCounter();
 	requestAnimationFrame(tick);
 }
 
@@ -188,7 +189,7 @@ function render() {
 
 	const sky = new Cube();
 	sky.color = [135/255, 206/255, 235/255, 1];	// sky blue
-	sky.textureType = 0;
+	sky.renderType = 0;
 	sky.matrix.scale(64, 64, 64);
 	sky.matrix.translate(-0.5, -0.5, -0.5);
 	sky.render();
@@ -203,10 +204,19 @@ function render() {
 			const wallHeight = map[y][x];
 			for (h = 0; h < wallHeight; h++) {
 				const cube = new Cube();
-				cube.textureType = 0;
+				cube.renderType = 0;
 				cube.matrix.translate(x-16, h, y-16);
 				cube.render();
 			}
 		}
 	}
+}
+
+let start = performance.now();
+const fpsCounter = document.getElementById("fpsCounter");
+function updateFPSCounter() {
+	const ms = performance.now() - start;	// time in-between this frame and the last
+	const fps = Math.floor(1000/ms);
+	fpsCounter.innerHTML = `ms: ${ms}, fps: ${fps}`;
+	start = performance.now();
 }

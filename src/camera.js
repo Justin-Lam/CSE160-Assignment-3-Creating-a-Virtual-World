@@ -1,6 +1,8 @@
 class Camera {
 	moveSpeed = 1;
-	/** (In degrees.) */panAmount = 15;
+	
+	/** (In degrees.) */
+	panAmount = 15;
 
 	constructor() {
 		this.fov = 60;
