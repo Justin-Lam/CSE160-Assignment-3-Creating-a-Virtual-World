@@ -264,6 +264,13 @@ function renderAllShapes() {
 
 	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
+	const sky = new Cube();
+	sky.color = [135/255, 206/255, 235/255, 1];	// sky blue
+	sky.textureType = 0;
+	sky.matrix.scale(64, 64, 64);
+	sky.matrix.translate(-0.5, -0.5, -0.5);
+	sky.render();
+
 	const floor = new Cube();
 	floor.matrix.translate(0, -0.5, 0);
 	floor.matrix.scale(32, 0, 32);	// scale y to 0 makes a plane
