@@ -16,9 +16,9 @@ const VSHADER_SOURCE = `
 const FSHADER_SOURCE = `
 	precision mediump float;
 	varying vec2 v_UV;
+	uniform int u_RenderType;
 	uniform vec4 u_FragColor;
 	uniform sampler2D u_Sampler0;
-	uniform int u_RenderType;
 
 	void main() {
 		if 		(u_RenderType == -1) 	gl_FragColor = vec4(v_UV, 1, 1);				// use UV debug color
@@ -34,10 +34,10 @@ let camera;
 
 const map = [	// 32x32x4
 	//                                            m  m
-	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+	[4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4],
+	[4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4],
+	[4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4],
+	[4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4],
 	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
 	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
 	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -74,9 +74,9 @@ let u_ModelMatrix;
 let u_ViewMatrix;
 let u_ProjectionMatrix;
 
+let u_RenderType;
 let u_FragColor;
 let u_Sampler0;
-let u_RenderType;
 
 function main() {
 	getGlobalVars();
@@ -106,8 +106,6 @@ function getGlobalVars() {
 function setupWebGL() {
 	if (!initShaders(gl, VSHADER_SOURCE, FSHADER_SOURCE)) throw new Error("Failed to intialize shaders.");
 
-	const identityMatrix = new Matrix4();
-
 	a_Position = gl.getAttribLocation(gl.program, "a_Position");
 	if (a_Position < 0) throw new Error("Failed to get the storage location of a_Position.");
 
@@ -116,7 +114,7 @@ function setupWebGL() {
 
 	u_ModelMatrix = gl.getUniformLocation(gl.program, "u_ModelMatrix");
 	if (!u_ModelMatrix) throw new Error("Failed to get the storage location of u_ModelMatrix.");
-	gl.uniformMatrix4fv(u_ModelMatrix, false, identityMatrix.elements);
+	gl.uniformMatrix4fv(u_ModelMatrix, false, new Matrix4().elements);	// identity matrix
 
 	u_ViewMatrix = gl.getUniformLocation(gl.program, "u_ViewMatrix");
 	if (!u_ViewMatrix) throw new Error("Failed to get the storage location of u_ViewMatrix.");
@@ -124,14 +122,14 @@ function setupWebGL() {
 	u_ProjectionMatrix = gl.getUniformLocation(gl.program, "u_ProjectionMatrix");
 	if (!u_ProjectionMatrix) throw new Error("Failed to get the storage location of u_ProjectionMatrix.");
 
+	u_RenderType = gl.getUniformLocation(gl.program, "u_RenderType");
+	if (!u_RenderType) throw new Error("Failed to get the storage location of u_RenderType.");
+
 	u_FragColor = gl.getUniformLocation(gl.program, "u_FragColor");
 	if (!u_FragColor) throw new Error("Failed to get the storage location of u_FragColor.");
 
 	u_Sampler0 = gl.getUniformLocation(gl.program, "u_Sampler0");
 	if (!u_Sampler0) throw new Error("Failed to get the storage location of u_Sampler0.");
-
-	u_RenderType = gl.getUniformLocation(gl.program, "u_RenderType");
-	if (!u_RenderType) throw new Error("Failed to get the storage location of u_RenderType.");
 }
 
 function initTextures() {
@@ -145,23 +143,12 @@ function sendTextureTo_TEXTURE0(image) {
 	const texture = gl.createTexture();
 	if (!texture) throw new Error("Failed to create the texture object.");
 
-	// Flip the image's y axis
-	gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
-
-	// Enable texture unit0
-	gl.activeTexture(gl.TEXTURE0);
-
-	// Bind the texture object to the target
-	gl.bindTexture(gl.TEXTURE_2D, texture);
-
-	// Set the texture parameters
-	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-
-	// Set the texture image
-	gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, image);
-
-	// Set the texture unit0 to the sampler
-	gl.uniform1i(u_Sampler0, 0);
+	gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);									// Flip the image's y axis
+	gl.activeTexture(gl.TEXTURE0);												// Enable texture unit0
+	gl.bindTexture(gl.TEXTURE_2D, texture);										// Bind the texture object to the target
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);			// Set the texture parameters
+	gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, image);	// Set the texture image
+	gl.uniform1i(u_Sampler0, 0);												// Set the texture unit0 to the sampler
 }
 
 function onKeydown(e) {
@@ -180,6 +167,10 @@ function tick() {
 	requestAnimationFrame(tick);
 }
 
+const skyBlue = [135/255, 206/255, 235/255, 1];
+const sky = new Cube(0, skyBlue);
+const floor = new Cube(1);
+const wall = new Cube(0);
 /** Renders the sky, floor, and map. */
 function render() {
 	gl.uniformMatrix4fv(u_ViewMatrix, false, camera.viewMatrix.elements);
@@ -187,28 +178,32 @@ function render() {
 
 	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-	const sky = new Cube();
-	sky.color = [135/255, 206/255, 235/255, 1];	// sky blue
-	sky.renderType = 0;
-	sky.matrix.scale(64, 64, 64);
-	sky.matrix.translate(-0.5, -0.5, -0.5);
+	/*
+	sky.modelMatrix.setIdentity();
+	sky.modelMatrix.scale(64, 64, 64);
+	sky.modelMatrix.translate(-0.5, -0.5, -0.5);
 	sky.render();
 
-	const floor = new Cube();
-	floor.matrix.scale(32, 0, 32);	// scale y to 0 makes a plane
-	floor.matrix.translate(-0.5, -0.5, -0.5);
+	floor.modelMatrix.setIdentity();
+	floor.modelMatrix.scale(32, 0, 32);	// scale y to 0 makes a plane
+	floor.modelMatrix.translate(-0.5, -0.5, -0.5);
 	floor.render();
+	*/
 
+	/*
+		Use a single cube to draw all the triangles
+		Once you draw the triangles, they stay
+		So we can then move the cube and draw more
+	*/
 	for (let y = 0; y < map.length; y++) {
-		for (let x = 0; x < map[0].length; x++) {
-			const wallHeight = map[y][x];
-			for (h = 0; h < wallHeight; h++) {
-				const cube = new Cube();
-				cube.renderType = 0;
-				cube.matrix.translate(x-16, h, y-16);
-				cube.render();
-			}
+	for (let x = 0; x < map[0].length; x++) {
+		const wallHeight = map[y][x];
+		for (h = 0; h < wallHeight; h++) {
+			wall.modelMatrix.setIdentity();
+			wall.modelMatrix.translate(x-16, h, y-16);
+			wall.render();
 		}
+	}
 	}
 }
 
