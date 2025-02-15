@@ -1,62 +1,27 @@
-let vertexBuffer = null;
-function initVertexBuffer() {
-	vertexBuffer = gl.createBuffer();
-	if (!vertexBuffer) throw new Error("Failed to create vertexBuffer.");
+const FSIZE = Float32Array.BYTES_PER_ELEMENT;
 
-	gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
-	gl.vertexAttribPointer(a_Position, 3, gl.FLOAT, false, 0, 0);
-	gl.enableVertexAttribArray(a_Position);
-}
+/** Contains vertex and uv data for 1+ triangles. */
+let arrayBuffer = null;
 
-/** @param {Float32Array} vertexCoords */
-function drawTriangles(vertexCoords) {
-	if (!vertexBuffer) initVertexBuffer();
+function initArrayBuffer() {
+	arrayBuffer = gl.createBuffer();
+	if (!arrayBuffer) throw new Error("Failed to create arrayBuffer.");
 
-	gl.bufferData(gl.ARRAY_BUFFER, vertexCoords, gl.DYNAMIC_DRAW)
+	gl.bindBuffer(gl.ARRAY_BUFFER, arrayBuffer);
 
-	const numVertices = vertexCoords.length/3;
-	gl.drawArrays(gl.TRIANGLES, 0, numVertices);
-}
-
-function drawTriangle3DUV(vertices, uv) {
-	/*
-		Positions
-	*/
-	const vertexBuffer = gl.createBuffer();
-	if (!vertexBuffer) throw new Error("Failed to create vertexBuffer.");
-
-	// Bind buffer obj to target
-	gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
-
-	// Write data into buffer obj
-	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.DYNAMIC_DRAW)
-
-	// Assign buffer obj to a_Position
-	gl.vertexAttribPointer(a_Position, 3, gl.FLOAT, false, 0, 0);
-
-	// Enable the assignment to a_Position
+	gl.vertexAttribPointer(a_Position, 3, gl.FLOAT, false, FSIZE*5, 0);
 	gl.enableVertexAttribArray(a_Position);
 
-	/*
-		UV
-	*/
-	const uvBuffer = gl.createBuffer();
-	if (!uvBuffer) throw new Error("Failed to create uvBuffer.");
-
-	// Bind buffer obj to target
-	gl.bindBuffer(gl.ARRAY_BUFFER, uvBuffer);
-
-	// Write data into buffer obj
-	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(uv), gl.DYNAMIC_DRAW)
-
-	// Assign buffer obj to a_UV
-	gl.vertexAttribPointer(a_UV, 2, gl.FLOAT, false, 0, 0);
-
-	// Enable the assignment to a_UV
+	gl.vertexAttribPointer(a_UV, 2, gl.FLOAT, false, FSIZE*5, FSIZE*3);
 	gl.enableVertexAttribArray(a_UV);
+}
 
-	/*
-		Draw
-	*/
-	gl.drawArrays(gl.TRIANGLES, 0, 3);
+/** @param {Float32Array} data vertex and uv data for the triangle(s) */
+function drawTriangles(data) {
+	if (!arrayBuffer) initArrayBuffer();
+
+	gl.bufferData(gl.ARRAY_BUFFER, data, gl.DYNAMIC_DRAW)
+
+	const numVertices = data.length/5;  // x, y, z, u, v = 5 components
+	gl.drawArrays(gl.TRIANGLES, 0, numVertices);
 }
