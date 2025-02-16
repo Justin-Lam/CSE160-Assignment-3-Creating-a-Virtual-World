@@ -22,12 +22,12 @@ class Cube {
 	]);
 
 	modelMatrix = new Matrix4();
-	renderType;	// -1: debug, 0: color, 1: texture
+	renderType;
 	color = [1,1,1,1];	// white
 
 	/**
 	 * Required to specify renderType.
-	 * @param {number} renderType -1: debug, 0: color, 1: texture
+	 * @param {number} renderType -1: debug, 0: color, 1: texture0, 2: texture1
 	 */
 	constructor(renderType, color) {
 		this.renderType = renderType;

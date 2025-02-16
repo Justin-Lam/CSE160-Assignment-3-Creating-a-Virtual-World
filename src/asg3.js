@@ -19,11 +19,13 @@ const FSHADER_SOURCE = `
 	uniform int u_RenderType;
 	uniform vec4 u_FragColor;
 	uniform sampler2D u_Sampler0;
+	uniform sampler2D u_Sampler1;
 
 	void main() {
 		if 		(u_RenderType == -1) 	gl_FragColor = vec4(v_UV, 1, 1);				// use UV debug color
 		else if (u_RenderType == 0) 	gl_FragColor = u_FragColor;						// use color
 		else if (u_RenderType == 1) 	gl_FragColor = texture2D(u_Sampler0, v_UV);		// use TEXTURE0
+		else if (u_RenderType == 2) 	gl_FragColor = texture2D(u_Sampler1, v_UV);		// use TEXTURE1
 		else 							gl_FragColor = vec4(1, 0.2, 0.2, 1);			// error, make red
 	}
 `;
@@ -131,25 +133,45 @@ function setupWebGL() {
 
 	u_Sampler0 = gl.getUniformLocation(gl.program, "u_Sampler0");
 	if (!u_Sampler0) throw new Error("Failed to get the storage location of u_Sampler0.");
+
+	u_Sampler1 = gl.getUniformLocation(gl.program, "u_Sampler1");
+	if (!u_Sampler1) throw new Error("Failed to get the storage location of u_Sampler1.");
 }
 
 function initTextures() {
-	const image = new Image();
-	if (!image) throw new Error("Failed to create the image object.");
-	image.onload = () => sendTextureTo_TEXTURE0(image);
-	image.src = "../assets/sky.jpg";
+	const image0 = new Image();
+	if (!image0) throw new Error("Failed to create the image object.");
+	image0.onload = () => sendToTexture0(image0);
+	image0.src = "../assets/gigaGrass.jpg";
+
+	const image1 = new Image();
+	if (!image1) throw new Error("Failed to create the image object.");
+	image1.onload = () => sendToTexture1(image1);
+	image1.src = "../assets/stone.jpg";
 }
 
-function sendTextureTo_TEXTURE0(image) {
+function sendToTexture0(image) {
 	const texture = gl.createTexture();
 	if (!texture) throw new Error("Failed to create the texture object.");
 
 	gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);									// Flip the image's y axis
-	gl.activeTexture(gl.TEXTURE0);												// Enable texture unit0
+	gl.activeTexture(gl.TEXTURE0);												// Enable texture0
 	gl.bindTexture(gl.TEXTURE_2D, texture);										// Bind the texture object to the target
 	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);			// Set the texture parameters
 	gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, image);	// Set the texture image
-	gl.uniform1i(u_Sampler0, 0);												// Set the texture unit0 to the sampler
+	gl.uniform1i(u_Sampler0, 0);												// Set the texture0 to the sampler
+}
+
+function sendToTexture1(image) {
+	const texture = gl.createTexture();
+	if (!texture) throw new Error("Failed to create the texture object.");
+
+	gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);									// Flip the image's y axis
+	gl.activeTexture(gl.TEXTURE1);												// Enable texture1
+	gl.bindTexture(gl.TEXTURE_2D, texture);										// Bind the texture object to the target
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);			// Set the texture parameters
+	gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, image);	// Set the texture image
+	gl.uniform1i(u_Sampler1, 1);												// Set the texture1 to the sampler
 }
 
 let prevCursorX;
@@ -183,7 +205,7 @@ function tick() {
 const skyBlue = [135/255, 206/255, 235/255, 1];
 const sky = new Cube(0, skyBlue);
 const floor = new Cube(1);
-const wall = new Cube(0);
+const wall = new Cube(2);
 /** Renders the sky, floor, and map. */
 function render() {
 	gl.uniformMatrix4fv(u_ViewMatrix, false, camera.viewMatrix.elements);
