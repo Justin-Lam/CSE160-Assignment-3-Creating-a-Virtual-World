@@ -46,16 +46,16 @@ const map = [	// 32x32x4
 	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
 	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
 	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],// m
-	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],// m
-	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+	[0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 2, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],// m
+	[0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 4, 3, 4, 3, 4, 0, 4, 3, 4, 3, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],// m
+	[0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+	[0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 3, 2, 3, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
 	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
 	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
 	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -90,10 +90,17 @@ function main() {
 	getGlobalVars();
 	setupWebGL();
 	initTextures();
+
 	document.onmousemove = (e) => onMouseMove(e);
 	document.onmousedown = (e) => onMouseDown(e);
 	document.onkeydown = (e) => onKeydown(e);
+
 	gl.clearColor(0,0,0,1);	// black
+
+	initSky();
+	initFloor();
+	initWalls();
+	initKing();
 
 	requestAnimationFrame(tick);
 }
@@ -217,33 +224,25 @@ function onKeydown(e) {
 	render();
 }
 
-function tick() {
-	render();
-	updateFPSCounter();
-	requestAnimationFrame(tick);
-}
-
-const skyBlue = [135/255, 206/255, 235/255, 1];
-const sky = new Cube(0, skyBlue);
-const floor = new Cube(1);
-const wall = new Cube(2);
-/** Renders the sky, floor, and map. */
-function render() {
-	gl.uniformMatrix4fv(u_ViewMatrix, false, camera.viewMatrix.elements);
-	gl.uniformMatrix4fv(u_ProjectionMatrix, false, camera.projectionMatrix.elements);
-
-	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-
+let sky;
+function initSky() {
+	const skyBlue = [135/255, 206/255, 235/255, 1];
+	sky = new Cube(0, skyBlue);
 	sky.modelMatrix.setIdentity();
 	sky.modelMatrix.scale(64, 64, 64);
 	sky.modelMatrix.translate(-0.5, -0.5, -0.5);
-	sky.render();
+}
 
+let floor;
+function initFloor() {
+	floor = new Cube(1);
 	floor.modelMatrix.setIdentity();
 	floor.modelMatrix.scale(32, 0, 32);	// scale y to 0 makes a plane
 	floor.modelMatrix.translate(-0.5, -0.5, -0.5);
-	floor.render();
+}
 
+const walls = [];
+function initWalls() {
 	/*
 		Use a single cube to draw all the triangles
 		Once you draw the triangles, they stay
@@ -253,12 +252,39 @@ function render() {
 	for (let x = 0; x < map[0].length; x++) {
 		const wallHeight = map[y][x];
 		for (h = 0; h < wallHeight; h++) {
+			const wall = new Cube(2);
 			wall.modelMatrix.setIdentity();
 			wall.modelMatrix.translate(x-16, h, y-16);
-			wall.render();
+			walls.push(wall);
 		}
 	}
 	}
+}
+
+let king;
+function initKing() {
+	const modelMatrix = new Matrix4();
+	modelMatrix.translate(-1, 0, 2);
+	king = new King(modelMatrix);
+}
+
+function tick() {
+	render();
+	updateFPSCounter();
+	requestAnimationFrame(tick);
+}
+
+/** Renders the sky, floor, and map. */
+function render() {
+	gl.uniformMatrix4fv(u_ViewMatrix, false, camera.viewMatrix.elements);
+	gl.uniformMatrix4fv(u_ProjectionMatrix, false, camera.projectionMatrix.elements);
+
+	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+	sky.render();
+	floor.render();
+	for (const wall of walls) wall.render();
+	king.render();
 }
 
 let start = performance.now();
