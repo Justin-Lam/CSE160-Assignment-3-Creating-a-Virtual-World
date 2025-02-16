@@ -156,12 +156,12 @@ function initTextures() {
 	const image0 = new Image();
 	if (!image0) throw new Error("Failed to create the image object.");
 	image0.onload = () => sendToTexture0(image0);
-	image0.src = "../assets/gigaGrass.jpg";
+	image0.src = "./assets/gigaGrass.jpg";
 
 	const image1 = new Image();
 	if (!image1) throw new Error("Failed to create the image object.");
 	image1.onload = () => sendToTexture1(image1);
-	image1.src = "../assets/stone.jpg";
+	image1.src = "./assets/stone.jpg";
 }
 
 function sendToTexture0(image) {
