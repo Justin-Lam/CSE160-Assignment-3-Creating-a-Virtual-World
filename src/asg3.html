@@ -9,7 +9,8 @@
 	<title>Paint Program</title>
   </head>
 
-  <body onload="main()">
+  <!-- learned how to disable context menu from https://stackoverflow.com/questions/381795/how-to-disable-right-click-context-menu-in-javascript -->
+  <body onload="main()" oncontextmenu="return false;">
 	<canvas id="webgl" width="400" height="400">
 	Please use a browser that supports "canvas"
 	</canvas>

@@ -51,8 +51,8 @@ const map = [	// 32x32x4
 	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
 	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
 	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],// m
 	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],// m
+	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],// m
 	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
 	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
 	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -68,6 +68,12 @@ const map = [	// 32x32x4
 	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
 	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
 	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+	/*
+		---> x
+		|
+		V
+		z
+	*/
 ];
 
 let a_Position;
@@ -85,6 +91,7 @@ function main() {
 	setupWebGL();
 	initTextures();
 	document.onmousemove = (e) => onMouseMove(e);
+	document.onmousedown = (e) => onMouseDown(e);
 	document.onkeydown = (e) => onKeydown(e);
 	gl.clearColor(0,0,0,1);	// black
 
@@ -100,7 +107,7 @@ function getGlobalVars() {
 	gl.enable(gl.DEPTH_TEST);
 
 	camera = new Camera();
-	const translation = new Vector3([0,1,0]);
+	const translation = new Vector3([0,1,8]);
 	camera.eye.add(translation);
 	camera.at.add(translation);
 }
@@ -184,6 +191,20 @@ function onMouseMove(e) {
 	camera.pan(dx);
 
 	prevCursorX = x;
+}
+
+function onMouseDown(e) {
+	const [x, y, z] = cameraToWorldCoords(camera.at.elements);
+
+	if (z < 0 || z > map.length-1 || x < 0 || x > map[0].length-1) return;	// if there were a block, it'd be off the map so there can't be a block
+
+	if (e.buttons === 1 && map[z][x] > 0) map[z][x]--;	// left click - remove block from stack (only if stack has blocks)
+	else if (e.buttons === 2) map[z][x]++;				// right click - add block to stack
+}
+
+function cameraToWorldCoords(position) {
+	const [x, y, z] = position;
+	return [Math.floor(x+16), y, Math.floor(z+16)];
 }
 
 function onKeydown(e) {
