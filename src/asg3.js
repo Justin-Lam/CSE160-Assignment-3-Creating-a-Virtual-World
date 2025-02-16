@@ -82,6 +82,7 @@ function main() {
 	getGlobalVars();
 	setupWebGL();
 	initTextures();
+	document.onmousemove = (e) => onMouseMove(e);
 	document.onkeydown = (e) => onKeydown(e);
 	gl.clearColor(0,0,0,1);	// black
 
@@ -149,6 +150,18 @@ function sendTextureTo_TEXTURE0(image) {
 	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);			// Set the texture parameters
 	gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, image);	// Set the texture image
 	gl.uniform1i(u_Sampler0, 0);												// Set the texture unit0 to the sampler
+}
+
+let prevCursorX;
+function onMouseMove(e) {
+	const x = e.clientX;
+
+	if (!prevCursorX) prevCursorX = x;
+
+	const dx = x - prevCursorX;
+	camera.pan(dx);
+
+	prevCursorX = x;
 }
 
 function onKeydown(e) {

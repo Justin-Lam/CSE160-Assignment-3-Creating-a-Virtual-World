@@ -4,6 +4,8 @@ class Camera {
 	/** (In degrees.) */
 	panAmount = 15;
 
+	mouseSensitivity = 0.25;
+
 	constructor() {
 		this.fov = 60;
 		this.eye = new Vector3([0,0,0]);
@@ -53,7 +55,7 @@ class Camera {
 		this.viewMatrix.setLookAt(...this.eye.elements, ... this.at.elements, ...this.up.elements);
 	}
 
-	// Only difference between the two is the sign of this.panAmount
+	// Only difference between panLeft() and panRight() is the sign of this.panAmount
 	panLeft() {
 		const fwd_current = new Vector3().set(this.at).sub(this.eye);	// fwd = at - eye
 		const rotationMatrix = new Matrix4().setRotate(this.panAmount, ...this.up.elements);
@@ -66,6 +68,16 @@ class Camera {
 		const fwd_current = new Vector3().set(this.at).sub(this.eye);	// fwd = at - eye
 		const rotationMatrix = new Matrix4();
 		rotationMatrix.setRotate(-this.panAmount, ...this.up.elements);
+		const fwd_new = rotationMatrix.multiplyVector3(fwd_current);
+
+		this.at.set(this.eye).add(fwd_new);	// at = eye + fwd_new
+		this.viewMatrix.setLookAt(...this.eye.elements, ... this.at.elements, ...this.up.elements);
+	}
+	pan(dx) {
+		const angle = dx * this.mouseSensitivity;
+
+		const fwd_current = new Vector3().set(this.at).sub(this.eye);	// fwd = at - eye
+		const rotationMatrix = new Matrix4().setRotate(-angle, ...this.up.elements);
 		const fwd_new = rotationMatrix.multiplyVector3(fwd_current);
 
 		this.at.set(this.eye).add(fwd_new);	// at = eye + fwd_new
